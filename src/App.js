@@ -1,23 +1,39 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Items from './components/Items/Items';
+import {BrowserRouter as Router , Route , Routes} from 'react-router-dom';
+import Summary from './components/Summary/Summary';
+import {Toaster} from 'react-hot-toast';
 
 function App() {
+  const [data , setData] = useState([]);
+  const [item , setItem] = useState([]);
+  const fetchUserData = async () => {
+    await fetch('https://api.tvmaze.com/search/shows?q=all')
+    .then(response => {
+      return response.json();
+    })
+    .then(res => {
+      setData(res);
+    });
+  console.log(data);
+  }
+  useEffect(()=>{
+    fetchUserData();
+  },[])
+  const handleSummaryClick = (data) => {
+    setItem(data);
+    console.log('Item: ' , item);
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Toaster position='top-right'/>
+      <Router>
+        <Routes>
+          <Route path = '/summary' element = {<Summary data = {item}/>}/>
+          <Route path = '/' element = {<Items data = {data} handleClick = {handleSummaryClick} />}/>
+        </Routes>
+      </Router>
     </div>
   );
 }
